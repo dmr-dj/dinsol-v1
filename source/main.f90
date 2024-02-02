@@ -32,11 +32,20 @@
   program dinsol_main
 
   use variable_names
+  
+  ! dmr --- [no fixed units]
+  integer :: n_namelist, ii
+  integer, dimension(6) :: n_BergerTable
+  integer, dimension(3) :: n_LaskarTable
+  integer, dimension(6) :: n_outputFiles
     
   !Opening and reading namelist data
-  open(unit=10,file='namelist')
-  read(10,inputs)
-
+  open(newunit=n_namelist,file='namelist')
+  
+  read(n_namelist,inputs)
+  
+  close (n_namelist)
+  
   if (year >= -249e6 .and. year <= 21e6) then 
 
   if (S0 > 0. .and. S0 < 1e8)  then
@@ -63,26 +72,36 @@
      if ( ntime == 5 ) nt=96                                                      
                          
      !Opening data tables
-     open(11,file='input/BERGER_1978/B78_Table1.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt1)
-     open(12,file='input/BERGER_1978/B78_Table4.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt4)
-     open(13,file='input/BERGER_1978/B78_Table5.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt5)
-     open(14,file='input/BERGER_1990/B90_Table1.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt1)
-     open(15,file='input/BERGER_1990/B90_Table4.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt4)
-     open(16,file='input/BERGER_1990/B90_Table5.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt5)
-     open(17,file='input/LASKAR_2004_2011/ecc.bin',   ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
-     open(18,file='input/LASKAR_2004_2011/eps.bin',   ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
-     open(19,file='input/LASKAR_2004_2011/varpi.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
+     open(newunit=n_BergerTable(1),file='input/BERGER_1978/B78_Table1.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt1)
+     open(newunit=n_BergerTable(2),file='input/BERGER_1978/B78_Table4.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt4)
+     open(newunit=n_BergerTable(3),file='input/BERGER_1978/B78_Table5.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt5)
+     open(newunit=n_BergerTable(4),file='input/BERGER_1990/B90_Table1.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt1)
+     open(newunit=n_BergerTable(5),file='input/BERGER_1990/B90_Table4.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt4)
+     open(newunit=n_BergerTable(6),file='input/BERGER_1990/B90_Table5.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt5)
+     open(n_LaskarTable(1),file='input/LASKAR_2004_2011/ecc.bin',   ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
+     open(n_LaskarTable(2),file='input/LASKAR_2004_2011/eps.bin',   ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
+     open(n_LaskarTable(3),file='input/LASKAR_2004_2011/varpi.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
 
      !Reading data table
-     read(11, rec=1) B78_Tb1(:)
-     read(12, rec=1) B78_Tb4(:)
-     read(13, rec=1) B78_Tb5(:)
-     read(14, rec=1) B90_Tb1(:)
-     read(15, rec=1) B90_Tb4(:)
-     read(16, rec=1) B90_Tb5(:)
-     read(17, rec=1) L_ecc(:)
-     read(18, rec=1) L_eps(:)
-     read(19, rec=1) L_varpi(:)
+     read(n_BergerTable(1), rec=1) B78_Tb1(:)
+     read(n_BergerTable(2), rec=1) B78_Tb4(:)
+     read(n_BergerTable(3), rec=1) B78_Tb5(:)
+     read(n_BergerTable(4), rec=1) B90_Tb1(:)
+     read(n_BergerTable(5), rec=1) B90_Tb4(:)
+     read(n_BergerTable(6), rec=1) B90_Tb5(:)
+     read(n_LaskarTable(1), rec=1) L_ecc(:)
+     read(n_LaskarTable(2), rec=1) L_eps(:)
+     read(n_LaskarTable(3), rec=1) L_varpi(:)
+
+
+     !Closing reading tables (dmr, 2024-02-02)
+     do ii=1, UBOUND(n_BergerTable,DIM=1)
+       close(n_BergerTable(ii))
+     enddo
+
+     do ii=1, UBOUND(n_LaskarTable,DIM=1)
+       close(n_LaskarTable(ii))
+     enddo
 
      !Opening files to record results
      open(20,file='output/solar.radiation.ctl',form='formatted',action='write',status='unknown')
