@@ -43,7 +43,7 @@
 !  #                                                                                         #
 !  ###########################################################################################
 
-  module variable_names
+  module dinsol_mod
 
   ! -> CONFIGURE (e.g: Intel Fortran require "ireal=1", while the GNU Fortran require "ireal=4")  
   integer                          ::  ireal = 4    
@@ -107,13 +107,13 @@
 
   namelist / inputs / year, S0, ny, nx, ntime, calendar, orbital, ecc, oblq, prcs
 
-  end module variable_names
+  contains
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   subroutine dinsol_model
 
-  use variable_names
+!~   use variable_names
   
   !Defining data for the calendar type
   if (calendar == 1) then
@@ -327,7 +327,7 @@
   !                            ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  use variable_names
+!~   use variable_names
 
   !Converting data from tables
   B78_A      =  B78_Amp1/3600.            
@@ -376,7 +376,7 @@
   !                            ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  use variable_names
+!~   use variable_names
 
   !Converting data from tables
   B90_A      =  B90_Amp1/3600.
@@ -425,7 +425,7 @@
   !                                  ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  use variable_names
+!~   use variable_names
 
   yr=year/1000               !Referential year
    
@@ -470,7 +470,7 @@
   !                              ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  use variable_names
+!~   use variable_names
   
   lambd=0     !Initial solar longitude fixed in 21.0 March [Vernal equinox]
   
@@ -497,7 +497,7 @@
 
   subroutine calendar_function(mday0)
 
-  use variable_names
+!~   use variable_names
   
   real :: mday0
 
@@ -599,7 +599,7 @@
   !                                     ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  use variable_names 
+!~   use variable_names 
  
   !Perihelion day
   peri =  -varpi - 2*(((1./2.)*ecc+(1./8.)*ecc**3.)*(1.+beta)*sin(-varpi)   &
@@ -636,7 +636,7 @@
   !                                               ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  use variable_names
+!~   use variable_names
 
   lambd=0       !Initial solar longitude fixed in 21.0 March [Vernal equinox]
 
@@ -692,7 +692,7 @@
 
   subroutine days_loop
 
-  use variable_names
+!~   use variable_names
 
   write(21,'(A65)') ' Year   Day  TrueLong  Rho   Lat  Decl  Sunshine  Insol'
 
@@ -733,7 +733,7 @@
   !                                             ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-   use variable_names
+!~    use variable_names
       
   !Latitudinal daily insolation loop
   do y=1, ny
@@ -771,7 +771,7 @@
   !                                             ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
-  use variable_names
+!~   use variable_names
   
   !Time hours loop
   do time=1, nt
@@ -812,7 +812,7 @@
   !                                             ! 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  use variable_names
+!~   use variable_names
 
     integer                   ::   i0  
     real, dimension(ny)       ::   irrad_avg0, insol0
@@ -825,4 +825,7 @@
     write(24,rec=i0) Hrad0         !Writing global radiation to a binary file
      
   end subroutine output_data
+
+
+  end module dinsol_mod
 

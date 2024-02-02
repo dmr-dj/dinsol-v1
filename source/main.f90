@@ -31,7 +31,7 @@
 
   program dinsol_main
 
-  use variable_names
+  use dinsol_mod
   
   ! dmr --- [no fixed units]
   integer :: n_namelist, ii
