@@ -107,13 +107,29 @@
 
   namelist / inputs / year, S0, ny, nx, ntime, calendar, orbital, ecc, oblq, prcs
 
+  ! dmr --- Variable to keep the files open at module level
+  integer :: fileout_insolTXT, fileout_rad, fileout_solarad
+
   contains
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  subroutine dinsol_init
+    ! dmr added this routine to avoid the main program doing much things at once, modularity ... 
+  
+  
+  
+  end subroutine dinsol_init
+
+
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   subroutine dinsol_model
 
 !~   use variable_names
+
+  integer :: id_fileoutCTL, id_fileoutTXT
   
   !Defining data for the calendar type
   if (calendar == 1) then
@@ -247,73 +263,85 @@
   print "(A,I7,A,F12.2,A)","   Points of Longitude = ",nx,"  |  Time Interval  = ",24./nt*1.," hr" 
   print "(A,I7,A,F12.2,A)","   Points of Latitude  = ",ny,"  |  Degree         = ",(res_lat+res_lon)/2.," dg"
   print *," ---------------------------------------------------------------------"
+				
+				
+				
+  !Opening files to record results
+  open(newunit=id_fileoutCTL,file='output/solar.radiation.ctl',form='formatted',action='write',status='unknown')
 						   
   !Writing descriptor file for GrADS
-  write(20,'(A21                      )')'DSET ^solar.radiation'
-  write(20,'(A1                       )')'*'
-  write(20,'(A13                      )')'*OPTIONS YREV'
-  write(20,'(A1                       )')'*'
-  write(20,'(A17                      )')'UNDEF -0.1000E+06' 
-  write(20,'(A1                       )')'*'
-  write(20,'(A42                      )')'TITLE DAILY INSOLATION (DINSOL-v1.0) MODEL'
-  write(20,'(A1                       )')'*'
-  write(20,'(A22                      )')'XDEF    1 LINEAR  1  1'
-  write(20,'(A6,I6,A10,f12.5,A2,f12.5 )')'YDEF   ',ny,' LINEAR   ',ilat,'  ',res_lat
-  write(20,'(A18                      )')'ZDEF    1 LEVELS 1'
-  write(20,'(A5,I4, A23               )')'TDEF ',ndays,' LINEAR  1JAN1 1dy'
-  write(20,'(A6                       )')'VARS 1'
-  write(20,'(A35                      )')'rad  0 99 Daily Insolation [W/m^2]'
-  write(20,'(A7                       )')'ENDVARS'
-  close(20,status='keep')
+  write(id_fileoutCTL,'(A21                      )')'DSET ^solar.radiation'
+  write(id_fileoutCTL,'(A1                       )')'*'
+  write(id_fileoutCTL,'(A13                      )')'*OPTIONS YREV'
+  write(id_fileoutCTL,'(A1                       )')'*'
+  write(id_fileoutCTL,'(A17                      )')'UNDEF -0.1000E+06' 
+  write(id_fileoutCTL,'(A1                       )')'*'
+  write(id_fileoutCTL,'(A42                      )')'TITLE DAILY INSOLATION (DINSOL-v1.0) MODEL'
+  write(id_fileoutCTL,'(A1                       )')'*'
+  write(id_fileoutCTL,'(A22                      )')'XDEF    1 LINEAR  1  1'
+  write(id_fileoutCTL,'(A6,I6,A10,f12.5,A2,f12.5 )')'YDEF   ',ny,' LINEAR   ',ilat,'  ',res_lat
+  write(id_fileoutCTL,'(A18                      )')'ZDEF    1 LEVELS 1'
+  write(id_fileoutCTL,'(A5,I4, A23               )')'TDEF ',ndays,' LINEAR  1JAN1 1dy'
+  write(id_fileoutCTL,'(A6                       )')'VARS 1'
+  write(id_fileoutCTL,'(A35                      )')'rad  0 99 Daily Insolation [W/m^2]'
+  write(id_fileoutCTL,'(A7                       )')'ENDVARS'
+  close(id_fileoutCTL,status='keep')
 
   if ( ntime == 1 ) tdef='6hr'
   if ( ntime == 2 ) tdef='3hr'
   if ( ntime == 3 ) tdef='1hr'
   if ( ntime == 4 ) tdef='30mn'
   if ( ntime == 5 ) tdef='15mn'
-                                                                                 
+
+  open(newunit=id_fileoutCTL,file='output/radiation.ctl',form='formatted',action='write',status='unknown')				
+
   !Writing descriptor file for GrADS
-  write(25,'(A15                      )')'DSET ^radiation'
-  write(25,'(A1                       )')'*'
-  write(25,'(A13                      )')'*OPTIONS YREV'
-  write(25,'(A1                       )')'*'
-  write(25,'(A17                      )')'UNDEF -0.1000E+06' 
-  write(25,'(A1                       )')'*'
-  write(25,'(A42                      )')'TITLE DAILY INSOLATION (DINSOL-v1.0) MODEL'
-  write(25,'(A1                       )')'*'
-  write(25,'(A6,I6,A13,f12.5          )')'XDEF   ',nx,' LINEAR   0  ',res_lon
-  write(25,'(A6,I6,A10,f12.5,A2,f12.5 )')'YDEF   ',ny,' LINEAR   ',ilat,'  ',res_lat
-  write(25,'(A18                      )')'ZDEF    1 LEVELS 1'
-  write(25,'(A5,I5, A19, A5           )')'TDEF ',ndays*nt,' LINEAR  1JAN1 ',tdef
-  write(25,'(A6                       )')'VARS 1'
-  write(25,'(A43                      )')'rad  0 99 Instantaneous irradiation [W/m^2]'
-  write(25,'(A7                       )')'ENDVARS'
-  close(25,status='keep')
-  	  
+  write(id_fileoutCTL,'(A15                      )')'DSET ^radiation'
+  write(id_fileoutCTL,'(A1                       )')'*'
+  write(id_fileoutCTL,'(A13                      )')'*OPTIONS YREV'
+  write(id_fileoutCTL,'(A1                       )')'*'
+  write(id_fileoutCTL,'(A17                      )')'UNDEF -0.1000E+06' 
+  write(id_fileoutCTL,'(A1                       )')'*'
+  write(id_fileoutCTL,'(A42                      )')'TITLE DAILY INSOLATION (DINSOL-v1.0) MODEL'
+  write(id_fileoutCTL,'(A1                       )')'*'
+  write(id_fileoutCTL,'(A6,I6,A13,f12.5          )')'XDEF   ',nx,' LINEAR   0  ',res_lon
+  write(id_fileoutCTL,'(A6,I6,A10,f12.5,A2,f12.5 )')'YDEF   ',ny,' LINEAR   ',ilat,'  ',res_lat
+  write(id_fileoutCTL,'(A18                      )')'ZDEF    1 LEVELS 1'
+  write(id_fileoutCTL,'(A5,I5, A19, A5           )')'TDEF ',ndays*nt,' LINEAR  1JAN1 ',tdef
+  write(id_fileoutCTL,'(A6                       )')'VARS 1'
+  write(id_fileoutCTL,'(A43                      )')'rad  0 99 Instantaneous irradiation [W/m^2]'
+  write(id_fileoutCTL,'(A7                       )')'ENDVARS'
+  close(id_fileoutCTL,status='keep')
+
+
+  open(newunit=id_fileoutTXT,file='output/summary.txt',form='formatted',action='write',status='unknown')  	  
+  
   !Writing summary file
-  write(23,'(A6)   ') "resume"  
-  write(23,'(I12)  ') year 
-  write(23,'(F12.2)') S0
-  write(23,'(I12)  ') nx
-  write(23,'(I12)  ') ny
-  write(23,'(I12)  ') nt    
-  write(23,'(I12)  ') ndays
-  write(23,'(I12)  ') orbital
-  write(23,'(F12.6)') ecc
-  write(23,'(F12.6)') oblq
-  write(23,'(F12.6)') prcs
-  write(23,'(F12.2)') summer
-  write(23,'(A3)   ') mon_summer
-  write(23,'(F12.2)') autumn
-  write(23,'(A3)   ') mon_autumn
-  write(23,'(F12.2)') winter
-  write(23,'(A3)   ') mon_winter
-  write(23,'(F12.2)') peri
-  write(23,'(A3)   ') mon_peri    
-  write(23,'(F12.2)') aphel
-  write(23,'(A3)   ') mon_aphel    
-  write(23,'(F12.2)') irrad_avg(pointP)/ndays
-  write(23,'(F12.2)') irrad_avg(pointT)/ndays
+  write(id_fileoutTXT,'(A6)   ') "resume"  
+  write(id_fileoutTXT,'(I12)  ') year 
+  write(id_fileoutTXT,'(F12.2)') S0
+  write(id_fileoutTXT,'(I12)  ') nx
+  write(id_fileoutTXT,'(I12)  ') ny
+  write(id_fileoutTXT,'(I12)  ') nt    
+  write(id_fileoutTXT,'(I12)  ') ndays
+  write(id_fileoutTXT,'(I12)  ') orbital
+  write(id_fileoutTXT,'(F12.6)') ecc
+  write(id_fileoutTXT,'(F12.6)') oblq
+  write(id_fileoutTXT,'(F12.6)') prcs
+  write(id_fileoutTXT,'(F12.2)') summer
+  write(id_fileoutTXT,'(A3)   ') mon_summer
+  write(id_fileoutTXT,'(F12.2)') autumn
+  write(id_fileoutTXT,'(A3)   ') mon_autumn
+  write(id_fileoutTXT,'(F12.2)') winter
+  write(id_fileoutTXT,'(A3)   ') mon_winter
+  write(id_fileoutTXT,'(F12.2)') peri
+  write(id_fileoutTXT,'(A3)   ') mon_peri    
+  write(id_fileoutTXT,'(F12.2)') aphel
+  write(id_fileoutTXT,'(A3)   ') mon_aphel    
+  write(id_fileoutTXT,'(F12.2)') irrad_avg(pointP)/ndays
+  write(id_fileoutTXT,'(F12.2)') irrad_avg(pointT)/ndays
+  
+  close(id_fileoutTXT, status='keep')
   
   end subroutine dinsol_model
 
@@ -694,7 +722,12 @@
 
 !~   use variable_names
 
-  write(21,'(A65)') ' Year   Day  TrueLong  Rho   Lat  Decl  Sunshine  Insol'
+  open(newunit=fileout_rad,file='output/radiation',access='direct',form='unformatted',recl=ireal*ny*nx*nt)  
+  open(newunit=fileout_solarad,file='output/solar.radiation',access='direct',form='unformatted',recl=ireal*ny)
+      
+  open(newunit=fileout_insolTXT,file='output/insolation.txt',form='formatted',action='write',status='unknown')
+  
+  write(fileout_insolTXT,'(A65)') ' Year   Day  TrueLong  Rho   Lat  Decl  Sunshine  Insol'
 
   irrad_avg = 0    !Daily insolation annual average - starter
 
@@ -721,6 +754,11 @@
 
   end do
 
+  close(fileout_insolTXT, status='keep')
+  
+  close(fileout_rad,status='keep')
+  close(fileout_solarad,status='keep')
+  
   end subroutine days_loop
 
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -754,7 +792,7 @@
                              cos(lat)*cosdecl*sinH0)     
                     
     !Write informations and data to text file   
-    write(21,'(I12, I5, F12.2, F12.6, F12.2, F12.2, F12.2, F12.2)') year, i, truelong(cldr)*rad2deg, &
+    write(fileout_insolTXT,'(I12, I5, F12.2, F12.6, F12.2, F12.2, F12.2, F12.2)') year, i, truelong(cldr)*rad2deg, &
                                                      rho, lat*rad2deg, asin(sindecl)*rad2deg, NH0(y), insol(y)
 
   end do
@@ -820,10 +858,10 @@
    
     irrad_avg0=irrad_avg0+insol0   !Increment for annual average of the daily insolation  
     where (Hrad0 < 0.) Hrad0=0.
-
-    write(22,rec=i0) insol0        !Writing daily insolation to a binary file
-    write(24,rec=i0) Hrad0         !Writing global radiation to a binary file
-     
+    
+    write(fileout_solarad,rec=i0) insol0        !Writing daily insolation to a binary file
+    write(fileout_rad,rec=i0) Hrad0         !Writing global radiation to a binary file    
+    
   end subroutine output_data
 
 
