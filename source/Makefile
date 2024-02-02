@@ -70,8 +70,8 @@ usage:
 dinsol: $(OBJ)
 	$(FC) -o $(EXEC) $(OBJ)
 
-dinsol.o : dinsol.f90
-	$(FC) $(LFLAGS) -c $(DFLAGS) dinsol.f90
+dinsol.o : dinsol.F90
+	$(FC) $(LFLAGS) -cpp -c $(DFLAGS) dinsol.F90
 
 main.o : main.f90 dinsol.o
 	$(FC) $(LFLAGS) -c $(DFLAGS) main.f90

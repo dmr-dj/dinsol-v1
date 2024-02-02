@@ -43,6 +43,8 @@
 !  #                                                                                         #
 !  ###########################################################################################
 
+#define PRINT
+
   module dinsol_mod
 
   ! -> CONFIGURE (e.g: Intel Fortran require "ireal=1", while the GNU Fortran require "ireal=4")  
@@ -195,7 +197,7 @@
       mon_aphel="---"
   end if
 
-     
+#ifdef PRINT
   print *,""
   print *," ---------------------------------------------------------------------"
   print *,"	             DAILY INSOLATION [DINSOL-v1.0] MODEL "            
@@ -264,7 +266,7 @@
   print "(A,I7,A,F12.2,A)","   Points of Latitude  = ",ny,"  |  Degree         = ",(res_lat+res_lon)/2.," dg"
   print *," ---------------------------------------------------------------------"
 				
-				
+#endif /* on defined PRINT */			
 				
   !Opening files to record results
   open(newunit=id_fileoutCTL,file='output/solar.radiation.ctl',form='formatted',action='write',status='unknown')
@@ -731,6 +733,8 @@
 
   irrad_avg = 0    !Daily insolation annual average - starter
 
+#ifdef PRINT
+
   !Printing the values of insolation and daylength in the terminator
   print *,""
   print *," DINSOL SIMULATION"
@@ -738,6 +742,8 @@
   print *,"--------------------------------------------------------------" 
   print *,"|  Day |    Insol(65N)  -  Hours |    Insol(23N)  -  Hours   |"
   print *,"--------------------------------------------------------------" 
+  
+#endif
   
   !Days loop [true solar longitude]
   do i=1, ndays
@@ -750,7 +756,11 @@
      call instantaneous_irradiance
      call output_data(i, irrad_avg, insol, Hrad)
 
+#ifdef PRINT
+
      print "(I7, A, F12.2, F12.2, A, F12.2, F12.2)", i, " |", insol(pointP), NH0(pointP), " |",insol(pointT), NH0(pointT)
+
+#endif
 
   end do
 
