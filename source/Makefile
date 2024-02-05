@@ -61,6 +61,8 @@ usage:
  	DFLAGS = -O3       	
  endif
 
+ libname=libdinsol.a
+
  EXEC=../dinsol.exe
 
  OBJ= \
@@ -76,11 +78,18 @@ dinsol.o : dinsol.F90
 main.o : main.f90 dinsol.o
 	$(FC) $(LFLAGS) -c $(DFLAGS) main.f90
 
+## Static library
+lib: $(libname)
+
+$(libname): dinsol.o
+	ar -rv $@ $^
+	ranlib $@
+
 clean:
 	@echo ""	
 	@echo " **** Clean object files .o .mod ****"
 	@echo ""
-	rm -f ../dinsol.exe *.o *.mod 
+	rm -f ../dinsol.exe *.o *.mod $(libname)
 	@echo ""
 	@echo " **** Finishing ****"
 	@echo "" 
