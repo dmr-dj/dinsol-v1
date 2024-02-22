@@ -336,7 +336,48 @@
   
   end subroutine dinsol_init
 
+  subroutine get_orbit_param(ryear)
 
+  real :: ryear
+
+  !dmr this is built on the dinsol_model subroutine, but partial call only
+
+  if (ryear >= -249e6 .and. ryear <= 21e6) then 
+     year = ryear
+  else
+      stop
+  endif
+  
+  !Defining data for the calendar type
+  if (calendar == 1) then
+      ndays   = 365  
+      calendar_converter = 286              
+      vernal_point = 80*trunc-1
+  else 
+      ndays   = 360
+      calendar_converter = 280
+      vernal_point = 81*trunc-1
+  end if
+                           
+  if (orbital == 1) then
+      call orbital_berger1978            !Calling the subroutine that determines the orbital parameters from Berger (1978)
+  else if (orbital == 2) then
+      call orbital_berger1990            !Calling the subroutine that determines the orbital parameters from Berger and Loutre (1991)
+  else if (orbital == 3) then
+      call orbital_laskar                !Calling the subroutine that determines the orbital parameters from Laskar et al (2004;2011)
+  else if (orbital == 4) then
+      eps   = oblq*deg2rad               !User-defined orbital parameters 
+      varpi = prcs*deg2rad  
+      omega = amod(varpi+pi,twopi)
+  end if  
+
+  write(*,*) "DINSOL OBTAINED!!!"
+  write(*,*) "ecc = ", ecc
+  write(*,*) "obl = ", oblq
+  write(*,*) "prc = ", prcs
+
+  
+  end subroutine get_orbit_param
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

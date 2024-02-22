@@ -40,6 +40,7 @@
     if (valid_request) then
      !Calling program that runs all run subroutines
      call dinsol_model
+
     endif
 
   end program dinsol_main
