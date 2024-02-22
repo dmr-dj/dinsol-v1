@@ -95,6 +95,13 @@
   real                             ::  lambd, lambd_m
   real, dimension(:), allocatable  ::  insol, NH0, irrad_avg, Hrad
 
+
+! dmr Easier to have a consistent type for returning the orbital parameters at once
+  type orb_param
+     real:: ecc, oblq, prcs
+  end type orb_param
+
+
   !All namelist variables are declared here
   integer                          ::  year      = 0
   integer                          ::  calendar  = 0
@@ -336,9 +343,10 @@
   
   end subroutine dinsol_init
 
-  subroutine get_orbit_param(ryear)
+  function get_orbit_param(ryear) result(orbitals)
 
   real :: ryear
+  type(orb_param) :: orbitals
 
   !dmr this is built on the dinsol_model subroutine, but partial call only
 
@@ -371,13 +379,18 @@
       omega = amod(varpi+pi,twopi)
   end if  
 
+#ifdef PRINT
   write(*,*) "DINSOL OBTAINED!!!"
   write(*,*) "ecc = ", ecc
   write(*,*) "obl = ", oblq
   write(*,*) "prc = ", prcs
+#endif /* On defined PRINT */
 
+  orbitals%ecc = ecc
+  orbitals%oblq = oblq
+  orbitals%prcs = prcs
   
-  end subroutine get_orbit_param
+  end function get_orbit_param
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
