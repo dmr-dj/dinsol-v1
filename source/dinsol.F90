@@ -389,7 +389,6 @@
       omega = amod(varpi+pi,twopi)
   end if  
 
-#define PRINT
 #ifdef PRINT
   write(*,*) "DINSOL OBTAINED!!!"
   write(*,*) "ecc = ", ecc
