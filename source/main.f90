@@ -31,11 +31,11 @@
 
   program dinsol_main
 
-  use dinsol_mod, only: dinsol_init, dinsol_model! , get_orbit_param, orb_param
+  use dinsol_mod, only: dinsol_init, dinsol_model, get_orbit_param, orb_param
   
   logical :: valid_request
   
-!~   type(orb_param) :: OB
+  type(orb_param) :: OB
      
     call dinsol_init(valid_request)
 
@@ -43,8 +43,8 @@
      !Calling program that runs all run subroutines
      call dinsol_model
 
-!~      OB = get_orbit_param(0.)
-!~      write(*,*) "RESULTS = ", OB%ecc, OB%oblq, OB%prcs
+     OB = get_orbit_param(0.)
+     write(*,*) "RESULTS = ", OB%ecc, OB%oblq, OB%prcs
     endif
 
   end program dinsol_main

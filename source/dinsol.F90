@@ -98,7 +98,7 @@
 
 ! dmr Easier to have a consistent type for returning the orbital parameters at once
   type orb_param
-     real:: ecc, oblq, prcs
+     real(kind=4):: ecc, oblq, prcs
   end type orb_param
 
 
@@ -136,7 +136,7 @@
   valid_modelrun = .false.
     
   !Opening and reading namelist data
-  open(newunit=n_namelist,file='namelist')
+  open(newunit=n_namelist,file='namelist-dinsol')
   
   read(n_namelist,inputs)
   
@@ -168,15 +168,24 @@
      if ( ntime == 5 ) nt=96                                                      
                          
      !Opening data tables
-     open(newunit=n_BergerTable(1),file='input/BERGER_1978/B78_Table1.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt1)
-     open(newunit=n_BergerTable(2),file='input/BERGER_1978/B78_Table4.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt4)
-     open(newunit=n_BergerTable(3),file='input/BERGER_1978/B78_Table5.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B78_nt5)
-     open(newunit=n_BergerTable(4),file='input/BERGER_1990/B90_Table1.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt1)
-     open(newunit=n_BergerTable(5),file='input/BERGER_1990/B90_Table4.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt4)
-     open(newunit=n_BergerTable(6),file='input/BERGER_1990/B90_Table5.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*B90_nt5)
-     open(n_LaskarTable(1),file='input/LASKAR_2004_2011/ecc.bin',   ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
-     open(n_LaskarTable(2),file='input/LASKAR_2004_2011/eps.bin',   ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
-     open(n_LaskarTable(3),file='input/LASKAR_2004_2011/varpi.bin', ACCESS='DIRECT',FORM='UNFORMATTED', RECL=ireal*La_nt)
+     open(newunit=n_BergerTable(1),file='input/BERGER_1978/B78_Table1.bin', ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*B78_nt1)
+     open(newunit=n_BergerTable(2),file='input/BERGER_1978/B78_Table4.bin', ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*B78_nt4)
+     open(newunit=n_BergerTable(3),file='input/BERGER_1978/B78_Table5.bin', ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*B78_nt5)
+     open(newunit=n_BergerTable(4),file='input/BERGER_1990/B90_Table1.bin', ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*B90_nt1)
+     open(newunit=n_BergerTable(5),file='input/BERGER_1990/B90_Table4.bin', ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*B90_nt4)
+     open(newunit=n_BergerTable(6),file='input/BERGER_1990/B90_Table5.bin', ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*B90_nt5)
+     open(newunit=n_LaskarTable(1),file='input/LASKAR_2004_2011/ecc.bin',   ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*La_nt)
+     open(newunit=n_LaskarTable(2),file='input/LASKAR_2004_2011/eps.bin',   ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*La_nt)
+     open(newunit=n_LaskarTable(3),file='input/LASKAR_2004_2011/varpi.bin', ACCESS='DIRECT',FORM='UNFORMATTED' &
+                                  , CONVERT="LITTLE_ENDIAN" , RECL=ireal*La_nt)
 
      !Reading data table
      read(n_BergerTable(1), rec=1) B78_Tb1(:)
@@ -351,6 +360,7 @@
   !dmr this is built on the dinsol_model subroutine, but partial call only
 
   if (ryear >= -249e6 .and. ryear <= 21e6) then 
+     write(*,*) "YEAR USED DINSOL ==", ryear
      year = ryear
   else
       stop
@@ -379,6 +389,7 @@
       omega = amod(varpi+pi,twopi)
   end if  
 
+#define PRINT
 #ifdef PRINT
   write(*,*) "DINSOL OBTAINED!!!"
   write(*,*) "ecc = ", ecc
