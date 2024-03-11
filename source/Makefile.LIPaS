@@ -1,0 +1,107 @@
+  ##########################################################################################
+  #                                                                                        #
+  #                       DAILY INSOLATION (DINSOL-v1.0) MODEL                             #
+  #                                                                                        #
+  #                Universidade Federal do Vale do São Francisco - UNIVASF                 #
+  #                       Laboratório de Meteorologia - LabMet                             #
+  #                                                                                        #
+  #   Author: Emerson Damasceno de Oliveira                                                #
+  #   Last update: 17 January 2022                                                         #
+  #                                                                                        #
+  #   contact: emerson.oliveira@univasf.edu.br                                             #
+  #                                                                                        #
+  #  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  #
+  #                                                                                        #
+  #  Copyright (C) <2022>  <Emerson Damasceno de Oliveira>                                 #
+  #                                                                                        #
+  #  This program is free software: you can redistribute it and/or modify                  #
+  #  it under the terms of the GNU General Public License as published by                  #
+  #  the Free Software Foundation, either version 3 of the License, or                     #
+  #  (at your option) any later version.                                                   #
+  #                                                                                        #
+  #  This program is distributed in the hope that it will be useful,                       #
+  #  but WITHOUT ANY WARRANTY; without even the implied warranty of                        #
+  #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                         #
+  #  GNU General Public License for more details.                                          #
+  #                                                                                        #
+  #  You should have received a copy of the GNU General Public License                     #
+  #  along with this program.  If not, see <https://www.gnu.org/licenses/>.                #
+  #                                                                                        #
+  ##########################################################################################
+  #  Makefile modified to match LIPaS definitions, dmr-dj, 2024-03-11                      #
+
+.SUFFIXES: .f90 .f95 .o .mod
+.SHELL: /bin/sh
+.PHONY : usage
+
+usage:
+	@echo ""
+	@echo "    * USAGE * "
+	@echo ""	  
+	@echo " make dinsol  : source code compilation"
+	@echo " make clean   : clean object files"
+	@echo " make"																
+
+
+ FC    = @FORTRAN_COMPILER_PATH@
+ LFLAGS=
+ DFLAGS= @F_OPTIM_HIGH@
+ 
+ libname=libdinsol.a
+
+ EXEC=../dinsol.x
+
+ OBJ= \
+	dinsol.o \
+	main.o
+
+# Where to install stuff
+ prefix = @INSTALL_PREFIX@
+ bindir = ${prefix}/bin
+ libdir = ${prefix}/lib
+ incdir = ${prefix}/inc 
+ mandir = ${prefix}/man
+
+# How to install stuff
+ INSTALL     =/usr/bin/install -c
+ INSTALL_PROG=${INSTALL}
+ INSTALL_LIB =${INSTALL}
+ INSTALL_INC =${INSTALL}
+
+
+
+dinsol: $(OBJ)
+	$(FC) -o $(EXEC) $(OBJ)
+
+dinsol.o : dinsol.F90
+	$(FC) $(LFLAGS) -cpp -c $(DFLAGS) dinsol.F90
+
+main.o : main.f90 dinsol.o
+	$(FC) $(LFLAGS) -c $(DFLAGS) main.f90
+
+## Static library
+lib: $(libname)
+
+$(libname): dinsol.o
+	ar -rv $@ $^
+	ranlib $@
+
+install: $(PROG) $(libname)
+	$(INSTALL) -d $(bindir)
+	$(INSTALL_PROGRAM) $(PROG) $(bindir)
+	$(INSTALL) -d $(libdir)
+	$(INSTALL_LIB) $(libname) $(libdir)
+	$(INSTALL) -d $(incdir)
+	$(INSTALL_LIB) *.mod $(incdir)
+
+#~ 	$(INSTALL) -d $(mandir)/man1
+#~ 	$(INSTALL_DATA) makedepf90.1 $(mandir)/man1
+
+clean:
+	@echo ""	
+	@echo " **** Clean object files .o .mod ****"
+	@echo ""
+	rm -f ../dinsol.exe *.o *.mod $(libname)
+	@echo ""
+	@echo " **** Finishing ****"
+	@echo "" 
