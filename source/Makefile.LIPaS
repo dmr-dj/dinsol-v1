@@ -83,12 +83,12 @@ main.o : main.f90 dinsol.o
 lib: $(libname)
 
 $(libname): dinsol.o
-	ar -rv $@ $^
+	ar -rvc $@ $^
 	ranlib $@
 
-install: $(PROG) $(libname)
-	$(INSTALL) -d $(bindir)
-	$(INSTALL_PROGRAM) $(PROG) $(bindir)
+install: $(libname)
+	# $(INSTALL) -d $(bindir)
+	# $(INSTALL_PROGRAM) $(PROG) $(bindir)
 	$(INSTALL) -d $(libdir)
 	$(INSTALL_LIB) $(libname) $(libdir)
 	$(INSTALL) -d $(incdir)
