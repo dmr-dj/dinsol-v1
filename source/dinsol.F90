@@ -360,7 +360,9 @@
   !dmr this is built on the dinsol_model subroutine, but partial call only
 
   if (ryear >= -249e6 .and. ryear <= 21e6) then 
+#ifdef PRINT
      write(*,*) "YEAR USED DINSOL ==", ryear
+#endif /* On defined PRINT */
      year = ryear
   else
       stop
